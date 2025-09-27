@@ -2,26 +2,46 @@
 import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { useAuth } from "@/components/auth-context"
 
 type RecordItem = { id: string; name: string; date: string }
 
 const LS_KEY = "ssc_records_v1"
+const BY_USER_KEY = "ssc_records_by_user_v1"
 
 export default function RecordsPage() {
+  const { user } = useAuth()
   const [items, setItems] = useState<RecordItem[]>([])
   const [name, setName] = useState("")
 
   useEffect(() => {
     try {
-      const raw = localStorage.getItem(LS_KEY)
-      if (raw) setItems(JSON.parse(raw))
+      const rawByUser = localStorage.getItem(BY_USER_KEY)
+      const map = rawByUser ? (JSON.parse(rawByUser) as Record<string, RecordItem[]>) : {}
+      const forUser = user ? map[user.id] : undefined
+
+      if (forUser) {
+        setItems(forUser)
+      } else {
+        // fallback to old per-device list
+        const raw = localStorage.getItem(LS_KEY)
+        if (raw) setItems(JSON.parse(raw))
+      }
     } catch {}
-  }, [])
+  }, [user]) // Updated to use the entire user object
 
   const save = (next: RecordItem[]) => {
     setItems(next)
     try {
+      // keep legacy key updated (useful if not logged in)
       localStorage.setItem(LS_KEY, JSON.stringify(next))
+      // write by user id map
+      const rawByUser = localStorage.getItem(BY_USER_KEY)
+      const map = rawByUser ? (JSON.parse(rawByUser) as Record<string, RecordItem[]>) : {}
+      if (user) {
+        map[user.id] = next
+        localStorage.setItem(BY_USER_KEY, JSON.stringify(map))
+      }
     } catch {}
   }
 

@@ -15,8 +15,31 @@ export default function RegisterPage() {
     const email = String(formData.get("email") || "")
     const name = String(formData.get("name") || "")
     const role = String(formData.get("role") || roleFromQuery) as any
+    const specialty = String(formData.get("specialty") || "")
+    const language = String(formData.get("language") || "")
+
     if (!email || !name) return
-    login({ id: crypto.randomUUID(), name, email, role })
+    const newUser = { id: crypto.randomUUID(), name, email, role }
+    login(newUser)
+
+    if (role === "doctor") {
+      try {
+        const DOCTORS_KEY = "ssc_doctors_v1"
+        const raw = localStorage.getItem(DOCTORS_KEY)
+        const list = raw ? (JSON.parse(raw) as any[]) : []
+        const exists = list.some((d) => d.email === email)
+        const toAdd = {
+          id: newUser.id,
+          name,
+          email,
+          specialty: specialty || "General Physician",
+          language: language || "English",
+        }
+        const next = exists ? list : [toAdd, ...list]
+        localStorage.setItem(DOCTORS_KEY, JSON.stringify(next))
+      } catch {}
+    }
+
     router.push(`/dashboard/${role}`)
   }
 
@@ -42,6 +65,8 @@ export default function RegisterPage() {
               <option value="asha">ASHA Worker</option>
               <option value="admin">Admin</option>
             </select>
+            <Input name="specialty" placeholder="Doctor specialty (if Doctor)" />
+            <Input name="language" placeholder="Language (if Doctor)" />
             <Button type="submit" className="w-full">
               Register
             </Button>
