@@ -1,0 +1,53 @@
+"use client"
+import { useAuth } from "@/components/auth-context"
+import { useRouter, useSearchParams } from "next/navigation"
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
+import { Button } from "@/components/ui/button"
+
+export default function RegisterPage() {
+  const { login } = useAuth()
+  const router = useRouter()
+  const params = useSearchParams()
+  const roleFromQuery = (params.get("role") || "patient") as "patient" | "doctor" | "asha" | "admin"
+
+  async function onSubmit(formData: FormData) {
+    const email = String(formData.get("email") || "")
+    const name = String(formData.get("name") || "")
+    const role = String(formData.get("role") || roleFromQuery) as any
+    if (!email || !name) return
+    login({ id: crypto.randomUUID(), name, email, role })
+    router.push(`/dashboard/${role}`)
+  }
+
+  return (
+    <section className="mx-auto max-w-md px-4 py-10">
+      <Card>
+        <CardHeader>
+          <CardTitle>Create your account</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <form action={onSubmit} className="space-y-4">
+            <Input name="name" placeholder="Full name" required />
+            <Input name="email" placeholder="Email" type="email" required />
+            <Input name="password" placeholder="Password" type="password" required />
+            <select
+              name="role"
+              defaultValue={roleFromQuery}
+              className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+              aria-label="Select role"
+            >
+              <option value="patient">Patient</option>
+              <option value="doctor">Doctor</option>
+              <option value="asha">ASHA Worker</option>
+              <option value="admin">Admin</option>
+            </select>
+            <Button type="submit" className="w-full">
+              Register
+            </Button>
+          </form>
+        </CardContent>
+      </Card>
+    </section>
+  )
+}

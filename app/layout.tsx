@@ -8,6 +8,7 @@ import { I18nProvider } from "@/components/i18n-provider"
 import { SiteHeader } from "@/components/site-header"
 import { SiteFooter } from "@/components/site-footer"
 import { Suspense } from "react"
+import { AuthProvider } from "@/components/auth-context"
 
 export const metadata: Metadata = {
   title: "Sehat Saathi Connect",
@@ -31,11 +32,13 @@ export default function RootLayout({
     <html lang="en" className={`${inter.variable} ${GeistMono.variable} antialiased`}>
       <body className="font-sans bg-background text-foreground">
         <Suspense fallback={<div>Loading...</div>}>
-          <I18nProvider>
-            <SiteHeader />
-            <main className="min-h-[calc(100dvh-240px)]">{children}</main>
-            <SiteFooter />
-          </I18nProvider>
+          <AuthProvider>
+            <I18nProvider>
+              <SiteHeader />
+              <main className="min-h-[calc(100dvh-240px)]">{children}</main>
+              <SiteFooter />
+            </I18nProvider>
+          </AuthProvider>
         </Suspense>
         <Analytics />
       </body>

@@ -1,9 +1,9 @@
 "use client"
 
 import Link from "next/link"
-import { Button } from "@/components/ui/button"
 import { LanguageSwitcher } from "./language-switcher"
 import { useI18n } from "./i18n-provider"
+import { UserMenu } from "./user-menu"
 
 export function SiteHeader() {
   const { t } = useI18n()
@@ -36,9 +36,7 @@ export function SiteHeader() {
         </nav>
         <div className="flex items-center gap-3">
           <LanguageSwitcher />
-          <Button asChild variant="secondary">
-            <Link href="/login">{t.nav.login}</Link>
-          </Button>
+          <UserMenu />
         </div>
       </div>
       <nav className="md:hidden" aria-label="Mobile">

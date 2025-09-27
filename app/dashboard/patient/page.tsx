@@ -1,6 +1,15 @@
+"use client"
+import { useAuth } from "@/components/auth-context"
+
 export default function PatientDashboard() {
+  const { user } = useAuth()
   return (
     <section className="mx-auto max-w-6xl px-4 py-8">
+      <div className="mb-4 rounded-lg border border-border bg-card p-4">
+        <p className="text-sm text-muted-foreground">
+          Welcome{user?.name ? `, ${user.name}` : ""}! Explore your health tools and upcoming appointments below.
+        </p>
+      </div>
       <h1 className="text-2xl font-semibold">Patient Dashboard</h1>
       <div className="mt-6 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         <div className="rounded-lg border border-border bg-card p-4">
